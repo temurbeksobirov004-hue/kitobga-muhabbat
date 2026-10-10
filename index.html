@@ -1,74 +1,456 @@
 <!DOCTYPE html>
-<html>
+<html lang="uz">
 <head>
-    <title>Kitobxonlar Maskani - Eng Yaxshi Kitoblar Targ'iboti</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zukko Kitobxon - Global Kitob Portali</title>
     <style>
-        body { background-color: #fcf8f2; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; color: #2c3e50; }
-        header { background-color: #6d4c41; padding: 25px; text-align: center; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        header h1 { margin: 0; font-size: 32px; font-family: Georgia, serif; }
-        header p { margin: 5px 0 0 0; color: #ffecb3; font-style: italic; }
+        :root {
+            --asosiy-rang: #1a252f;
+            --yorqin-rang: #16a085;
+            --orqa-fon: #f4f6f7;
+            --matn-rang: #2c3e50;
+            --oltin: #f1c40f;
+            --oq: #ffffff;
+        }
+
+        body { 
+            background-color: var(--orqa-fon); 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            color: var(--matn-rang); 
+            line-height: 1.6;
+        }
+
+        header { 
+            background: linear-gradient(135deg, #1a252f, #2c3e50); 
+            padding: 50px 20px; 
+            text-align: center; 
+            color: var(--oq); 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
+        }
+
+        header h1 { margin: 0; font-size: 42px; font-family: Georgia, serif; letter-spacing: 1px; }
+        header p { margin: 12px 0 0 0; color: #bdc3c7; font-size: 18px; }
+
+        .iqtibos-blok {
+            background: var(--oq);
+            max-width: 1200px;
+            margin: 30px auto 0 auto;
+            padding: 25px;
+            border-left: 6px solid var(--yorqin-rang);
+            border-radius: 4px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            text-align: left;
+            box-sizing: border-box;
+        }
+        .iqtibos-sarlavha { margin: 0 0 8px 0; color: var(--yorqin-rang); text-transform: uppercase; font-size: 13px; letter-spacing: 2px; font-weight: bold; }
+        .iqtibos-matn { margin: 0; font-style: italic; font-size: 18px; color: #7f8c8d; }
+
+        .filtr-paneli {
+            max-width: 1200px;
+            margin: 30px auto;
+            background: var(--oq);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            box-sizing: border-box;
+        }
+
+        .qidiruv-qutisi { flex: 1; min-width: 320px; }
+        .qidiruv-qutisi input {
+            width: 100%;
+            padding: 14px 25px;
+            border: 2px solid #ecf0f1;
+            border-radius: 30px;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s all;
+            box-sizing: border-box;
+        }
+        .qidiruv-qutisi input:focus { border-color: var(--yorqin-rang); box-shadow: 0 0 10px rgba(22, 160, 133, 0.2); }
+
+        .janr-tugmalari { display: flex; flex-wrap: wrap; gap: 12px; }
+        .janr-tugma {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 12px 22px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #495057;
+            transition: 0.3s all;
+        }
+        .janr-tugma:hover, .janr-tugma.aktiv { background-color: var(--yorqin-rang); color: var(--oq); border-color: var(--yorqin-rang); }
+
+        .kitob-setka { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            gap: 35px; 
+            padding: 20px; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            box-sizing: border-box;
+        }
+
+        .kitob-karta { 
+            background: var(--oq); 
+            border-radius: 16px; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.05); 
+            overflow: hidden; 
+            display: flex;
+            flex-direction: column;
+            transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
+            border: 1px solid #e9ecef;
+        }
+        .kitob-karta:hover { transform: translateY(-12px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+
+        .rasm-konteyner { position: relative; height: 380px; background-color: #e9ecef; }
+        .kitob-rasm { width: 100%; height: 100%; object-fit: cover; }
+        .janr-belgi {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(26, 37, 47, 0.9);
+            color: var(--oq);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .kitob-kontent { padding: 25px; flex-grow: 1; display: flex; flex-direction: column; text-align: left; }
+        .kitob-sarlovha { font-size: 22px; margin: 0 0 6px 0; color: var(--asosiy-rang); font-family: Georgia, serif; }
+        .kitob-avtor { font-style: italic; color: #7f8c8d; margin-bottom: 12px; font-size: 15px; }
+        .reyting { color: var(--oltin); font-size: 15px; margin-bottom: 15px; }
+        .kitob-annotatsiya { font-size: 15px; color: #555; line-height: 1.6; margin: 0 0 25px 0; flex-grow: 1; }
         
-        .kitob-katak { display: flex; justify-content: center; flex-wrap: wrap; gap: 30px; padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
-        .kitob-kartochka { background: white; width: 300px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.08); overflow: hidden; text-align: center; transition: 0.3s; border: 1px solid #efebe9; }
-        .kitob-kartochka:hover { transform: translateY(-10px); box-shadow: 0 12px 20px rgba(0,0,0,0.15); }
-        .kitob-rasm { width: 100%; height: 380px; object-fit: cover; background-color: #e0e0e0; }
-        
-        .kitob-info { padding: 20px; }
-        .kitob-nomi { font-size: 20px; margin: 0 0 10px 0; color: #4e342e; }
-        .kitob-muallif { font-style: italic; color: #757575; margin-bottom: 10px; }
-        .kitob-tavsif { font-size: 15px; color: #5d4037; line-height: 1.5; height: 70px; overflow: hidden; }
-        
-        .sotib-olish-tugma { display: block; background-color: #e65100; color: white; padding: 12px; margin: 15px 0 0 0; text-decoration: none; font-weight: bold; border-radius: 6px; transition: 0.2s; }
-        .sotib-olish-tugma:hover { background-color: #bf360c; }
-        
-        footer { background-color: #4e342e; color: #d7ccc8; text-align: center; padding: 20px; margin-top: 50px; font-size: 14px; }
+        .harakat-tugmasi { 
+            display: block; 
+            background-color: #d35400; 
+            color: var(--oq); 
+            padding: 14px; 
+            text-align: center;
+            text-decoration: none; 
+            font-weight: bold; 
+            border-radius: 8px; 
+            transition: 0.3s all;
+            box-shadow: 0 5px 10px rgba(211, 84, 0, 0.2);
+        }
+        .harakat-tugmasi:hover { background-color: #b33939; box-shadow: 0 8px 15px rgba(211, 84, 0, 0.3); }
+
+        .taqrizlar-bo-limi { max-width: 1200px; margin: 50px auto; padding: 0 20px; text-align: left; box-sizing: border-box; }
+        .taqrizlar-sarlavha { color: var(--asosiy-rang); font-family: Georgia, serif; border-bottom: 3px solid #e9ecef; padding-bottom: 12px; margin-bottom: 25px; font-size: 28px; }
+        .taqriz-tarmoq { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
+        .taqriz-karta { background: var(--oq); padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); border: 1px solid #e9ecef; }
+        .taqriz-foydalanuvchi { font-weight: bold; color: var(--asosiy-rang); font-size: 16px; margin-bottom: 4px; }
+        .taqriz-sana { font-size: 13px; color: #95a5a6; margin-bottom: 12px; }
+        .taqriz-matn { font-size: 15px; color: #555; line-height: 1.6; margin: 0; }
+
+        footer { background-color: var(--asosiy-rang); color: #bdc3c7; text-align: center; padding: 30px; margin-top: 80px; font-size: 15px; }
     </style>
 </head>
-<body>
-
+<body><!-- INTERFEYS: TEPA PANEL -->
     <header>
         <h1>Zukko Kitobxon</h1>
-        <p>Hayotingizni o'zgartiradigan eng sara kitoblar sharhi va targ'iboti</p>
+        <p>Mukammal tahlil, xavfsiz tizim va eng sara jahon hamda o'zbek adabiyoti portali</p>
     </header>
 
-    <div class="kitob-katak">
+    <!-- INTERFEYS: HAFTA IQTIBOSI -->
+    <div class="iqtibos-blok">
+        <div class="iqtibos-sarlavha">Hafta iqtibosi</div>
+        <p class="iqtibos-matn">"Kitob o'qishdan to'xtagan odam fikrlashdan ham to'xtaydi." — Deni Didro</p>
+    </div>
 
-        <div class="kitob-kartochka">
-            <img class="kitob-rasm" src="https://picsum.photos" alt="Kitob rasmi">
-            <div class="kitob-info">
-                <h3 class="kitob-nomi">Diqqat (Deep Work)</h3>
-                <div class="kitob-muallif">Kel Nyuport</div>
-                <p class="kitob-tavsif">Chalg'ituvchi dunyoda muvaffaqiyatga erishishning eng muhim siri — diqqatni jamlash haqida ajoyib qo'llanma.</p>
-                <a href="https://asaxiy.uz" target="_blank" class="sotib-olish-tugma">Kitobni xarid qilish</a>
+    <!-- INTERFEYS: FILTR VA TEKOR QIDIRUV -->
+    <div class="filtr-paneli">
+        <div class="qidiruv-qutisi">
+            <input type="text" id="qidiruvInput" onkeyup="kodliQidiruv()" placeholder="Kitob nomi yoki muallifni yozing...">
+        </div>
+        <div class="janr-tugmalari">
+            <button class="janr-tugma aktiv" onclick="janrBoyichaFiltr('all', this)">Barchasi</button>
+            <button class="janr-tugma" onclick="janrBoyichaFiltr('biznes', this)">Biznes</button>
+            <button class="janr-tugma" onclick="janrBoyichaFiltr('badiiy', this)">Badiiy adabiyot</button>
+            <button class="janr-tugma" onclick="janrBoyichaFiltr('diniy', this)">Diniy adabiyot</button>
+            <button class="janr-tugma" onclick="janrBoyichaFiltr('psixologiya', this)">Psixologiya</button>
+        </div>
+    </div>
+
+    <!-- MATRITSA: KITOBLAR RO'YXATI BLOKLARI -->
+    <div class="kitob-setka" id="kitoblarKonteyneri">
+
+        <!-- 1-KITOB: BIZNES -->
+        <div class="kitob-karta" data-janr="biznes">
+            <div class="rasm-konteyner">
+                <img class="kitob-rasm" src="https://picsum.photos" alt="Kitob muqovasi">
+                <span class="janr-belgi">Biznes</span>
+            </div>
+            <div class="kitob-kontent">
+                <h3 class="kitob-sarlovha">Diqqat (Deep Work)</h3>
+                <div class="kitob-avtor">Kel Nyuport</div>
+                <div class="reyting">⭐⭐⭐⭐⭐ (4.9)</div>
+                <p class="kitob-annotatsiya">Chalg'ituvchi texnologiyalar dunyosida chalg'imasdan, chuqur diqqat bilan yirik natijalarga erishish va yuqori daromad topish strategiyalari.</p>
+                <a href="https://asaxiy.uz" target="_blank" class="harakat-tugmasi">Sharhni o'qish & Xarid</a>
             </div>
         </div>
 
-        <div class="kitob-kartochka">
-            <img class="kitob-rasm" src="https://picsum.photos" alt="Kitob rasmi">
-            <div class="kitob-info">
-                <h3 class="kitob-nomi">Atom odatlar</h3>
-                <div class="kitob-muallif">Jeyms Klir</div>
-                <p class="kitob-tavsif">Har kuni 1% ga yaxshilanish orqali hayotingizda qanday qilib ulkan natijalarga erishish mumkinligi haqida.</p>
-                <a href="https://asaxiy.uz" target="_blank" class="sotib-olish-tugma">Kitobni xarid qilish</a>
+        <!-- 2-KITOB: PSIXOLOGIYA -->
+        <div class="kitob-karta" data-janr="psixologiya">
+            <div class="rasm-konteyner">
+                <img class="kitob-rasm" src="https://picsum.photos" alt="Kitob muqovasi">
+                <span class="janr-belgi">Psixologiya</span>
+            </div>
+            <div class="kitob-kontent">
+                <h3 class="kitob-sarlovha">Atom odatlar</h3>
+                <div class="kitob-avtor">Jeyms Klir</div>
+                <div class="reyting">⭐⭐⭐⭐⭐ (4.8)</div>
+                <p class="kitob-annotatsiya">Har kuni bor-yo'g'i 1% lik kichik ijobiy odat shakllantirish orqali hayotni butkul o'zgartirish va shaxsiy o'sish sirlari.</p>
+                <a href="https://asaxiy.uz" target="_blank" class="harakat-tugmasi">Sharhni o'qish & Xarid</a>
             </div>
         </div>
 
-        <div class="kitob-kartochka">
-            <img class="kitob-rasm" src="https://picsum.photos" alt="Kitob rasmi">
-            <div class="kitob-info">
-                <h3 class="kitob-nomi">Boy ota, kambag'al ota</h3>
-                <div class="kitob-muallif">Robert Kiyosaki</div>
-                <p class="kitob-tavsif">Moliyaviy erkinlikka erishish, pullarni to'g'ri boshqarish va investitsiya qilish sirlari.</p>
-                <a href="https://asaxiy.uz" target="_blank" class="sotib-olish-tugma">Kitobni xarid qilish</a>
+        <!-- 3-KITOB: BADIIY -->
+        <div class="kitob-karta" data-janr="badiiy">
+            <div class="rasm-konteyner">
+                <img class="kitob-rasm" src="https://picsum.photos" alt="Kitob muqovasi">
+                <span class="janr-belgi">Badiiy adabiyot</span>
+            </div>
+            <div class="kitob-kontent">
+                <h3 class="kitob-sarlovha">Ufq trilogiyasi</h3>
+                <div class="kitob-avtor">Said Ahmad</div>
+                <div class="reyting">⭐⭐⭐⭐⭐ (5.0)</div>
+                <p class="kitob-annotatsiya">O'zbek adabiyotining eng durdona asarlaridan biri, urush va urushdan keyingi davr insonlar qismati shafqatsiz tasvirlangan.</p>
+                <a href="https://asaxiy.uz" target="_blank" class="harakat-tugmasi">Sharhni o'qish & Xarid</a>
+            </div>
+        </div><!-- 4-KITOB: DINIY -->
+        <div class="kitob-karta" data-janr="diniy">
+            <div class="rasm-konteyner">
+                <img class="kitob-rasm" src="https://picsum.photos" alt="Kitob muqovasi">
+                <span class="janr-belgi">Diniy adabiyot</span>
+            </div>
+            <div class="kitob-kontent">
+                <h3 class="kitob-sarlovha">Saodat asri qissalari</h3>
+                <div class="kitob-avtor">Ahmad Lutfiy Qozonchi</div>
+                <div class="reyting">⭐⭐⭐⭐⭐ (5.0)</div>
+                <p class="kitob-annotatsiya">Payg'ambarimiz alayhissalom hayotlari va Islom tarixi badiiy va ta'sirli tilda hikoya qilingan muhtasham asar.</p>
+                <a href="https://asaxiy.uz" target="_blank" class="harakat-tugmasi">Sharhni o'qish & Xarid</a>
             </div>
         </div>
 
     </div>
 
+    <!-- DOIMIYLIK: TAQRIZLAR (IZOHLAR) BO'LIMI -->
+    <div class="taqrizlar-bo-limi">
+        <h2 class="taqrizlar-sarlavha">Kitobxonlar nima deydi?</h2>
+        <div class="taqriz-tarmoq">
+            <div class="taqriz-karta">
+                <div class="taqriz-foydalanuvchi">Sardorbek Olimov</div>
+                <div class="taqriz-sana">Bugun, 09:30</div>
+                <p class="taqriz-matn">"Atom odatlar kitobining sharhini juda puxta yozibsizlar. Sayt dizayni ham nihoyatda qulay ekan, qidiruv tizimi juda tez ishlayapti!"</p>
+            </div>
+            <div class="taqriz-karta">
+                <div class="taqriz-foydalanuvchi">Gulnoza Toshpulatova</div>
+                <div class="taqriz-sana">Kecha, 18:15</div>
+                <p class="taqriz-matn">"Janrlar bo'yicha ajratilgani juda asqotdi. Saodat asri qissalari haqida o'qib, darhol xarid qilish tugmasi orqali kitobni buyurtma berdim."</p>
+            </div>
+        </div>
+    </div><!-- MOTOR: INFORMATSION MUKAMMAL SCRIPT (JAVASCRIPT) -->
+    <script>
+        // Qidiruv tizimi funksiyasi
+        function kodliQidiruv() {
+            let input = document.getElementById('qidiruvInput').value.toLowerCase();
+            let kartalar = document.getElementsByClassName('kitob-karta');
+            
+            for (let i = 0; i < kartalar.length; i++) {
+                let sarlovha = kartalar[i].querySelector('.kitob-sarlovha').innerText.toLowerCase();
+                let avtor = kartalar[i].querySelector('.kitob-avtor').innerText.toLowerCase();
+                
+                if (sarlovha.includes(input) || avtor.includes(input)) {
+                    kartalar[i].style.display = "";
+                } else {
+                    kartalar[i].style.display = "none";
+                }
+            }
+        }
+
+        // Janrlar filtri funksiyasi
+        function janrBoyichaFiltr(janr, element) {
+            // Aktiv tugma rangini yangilash
+            let tugmalar = document.getElementsByClassName('janr-tugma');
+            for(let i=0; i<tugmalar.length; i++) {
+                tugmalar[i].classList.remove('aktiv');
+            }
+            element.classList.add('aktiv');
+
+            // Kartalarni filtrlash
+            let kartalar = document.getElementsByClassName('kitob-karta');
+            for (let i = 0; i < kartalar.length; i++) {
+                if (janr === 'all') {
+                    kartalar[i].style.display = "";
+                } else {
+                    if (kartalar[i].getAttribute('data-janr') === janr) {
+                        kartalar[i].style.display = "";
+                    } else {
+                        kartalar[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html><!-- 4-BO'LEK: TEZ-TEZ SO'RALADIGAN SAVOLLAR (FAQ) -->
+    <div style="max-width: 1200px; margin: 50px auto; padding: 0 20px; text-align: left; box-sizing: border-box;">
+        <h2 style="color: var(--asosiy-rang); font-family: Georgia, serif; border-bottom: 3px solid #e9ecef; padding-bottom: 12px; margin-bottom: 25px; font-size: 28px;">Ko'p so'raladigan savollar</h2>
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); border: 1px solid #e9ecef;">
+            <h4 style="margin: 0 0 10px 0; color: var(--yorqin-rang);">Saytdan kitoblarni qanday xarid qilamiz?</h4>
+            <p style="margin: 0; color: #555; font-size: 15px;">"Sharhni o'qish & Xarid" tugmasini bossangiz, tizim sizni hamkorimizning xavfsiz rasmiy do'koniga o'tkazadi. U yerda eng arzon narxda rasmiy kitobni buyurtma berishingiz mumkin.</p>
+        </div>
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); border: 1px solid #e9ecef;">
+            <h4 style="margin: 0 0 10px 0; color: var(--yorqin-rang);">Kitoblar mualliflik huquqi himoyalanganmi?</h4>
+            <p style="margin: 0; color: #555; font-size: 15px;">Ha, biz faqatgina kitoblar targ'iboti va tahlili bilan shug'ullanamiz. Saytda piratlik mahsulotlari yoki noqonuniy PDF fayllar tarqatilmaydi.</p>
+        </div>
+    </div>
+
+    <!-- 5-BO'LEK: HAFTA KITOBXONI TANLOVI -->
+    <div style="max-width: 1200px; margin: 50px auto; padding: 20px; text-align: center; box-sizing: border-box; background: linear-gradient(135deg, #16a085, #1abc9c); color: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(22, 160, 133, 0.2);">
+        <h2 style="font-family: Georgia, serif; margin: 0 0 10px 0; font-size: 30px;">Oyning eng faol kitobxoni</h2>
+        <p style="max-width: 700px; margin: 0 auto 20px auto; font-size: 16px; color: #e0f2f1;">Saytimiz orqali eng ko'p kitob xarid qilgan va eng puxta taqriz yozgan faol foydalanuvchimiz joriy oy yakunida yirik pul mukofoti va sertifikat bilan taqdirlanadi!</p>
+        <span style="background: rgba(255,255,255,0.2); padding: 8px 20px; border-radius: 20px; font-weight: bold; font-size: 14px;">Hozirgi yetakchi: Temurbek Sobirov (12 ta taqriz)</span>
+    </div>
+
+    <!-- 6-BO'LEK: ELEKTRON POCHTA ORQALI OBUNA (NEWSLETTER - BAZA YIG'ISH) -->
+    <div style="max-width: 1200px; margin: 50px auto; padding: 40px 20px; text-align: center; box-sizing: border-box; background: white; border-radius: 16px; border: 1px solid #e9ecef; box-shadow: 0 8px 25px rgba(0,0,0,0.05);">
+        <h2 style="color: var(--asosiy-rang); font-family: Georgia, serif; margin: 0 0 10px 0; font-size: 28px;">Yangi kitoblar sharhini o'tkazib yubormang</h2>
+        <p style="color: #7f8c8d; max-width: 600px; margin: 0 auto 25px auto; font-size: 15px;">Elektron pochtangizni qoldiring va dunyoni larzaga keltirgan eng sara biznes hamda badiiy asarlar tahlilini birinchilardan bo'lib pochtangizda qabul qiling.</p>
+        <form action="#" method="POST" onsubmit="alert('Ajoyib! Obuna muvaffaqiyatli faollashdi. Rahmat!'); return false;" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 500px; margin: 0 auto;">
+            <input type="email" placeholder="Email manzilingizni kiriting" required style="flex: 1; min-width: 280px; padding: 14px 20px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 16px; outline: none;">
+            <button type="submit" style="background: var(--asosiy-rang); color: white; border: none; padding: 14px 28px; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s;">Obuna bo'lish</button>
+        </form>
+    </div>
+
     <footer>
-        <p>&copy; 2026 Zukko Kitobxon Portali. Barcha huquqlar himoyalangan.</p>
-        <p style="font-size: 12px; margin-top: 5px; color: #b0bec5;">Saytdan daromad olish tizimi faollashtirilgan</p>
+        <p>&copy; 2026 Zukko Kitobxon Enterprise. Tizim eng yuqori xavfsizlik va mualliflik huquqi standartlariga muvofiq ishlaydi.</p>
     </footer>
 
+</body>
+</html><!-- 4-BO'LEK: HAMKORLIK BANNERI VA O'YIN INTRO QISMI -->
+    <div style="max-width: 1200px; margin: 40px auto; padding: 15px; background: #fff2e6; border: 2px dashed #e65100; border-radius: 8px; color: #d35400; font-weight: bold; font-size: 15px;">
+        📢 HAMKORLIK REKLAMASI: "Asaxiy Books" do'konidan haftalik chegirmalar! Kodimiz orqali kitoblarni 15% arzonroq xarid qiling!
+    </div>
+
+    <div style="max-width: 1200px; margin: 30px auto; padding: 30px; background: white; border-radius: 16px; border: 1px solid #e9ecef; box-shadow: 0 8px 25px rgba(0,0,0,0.04); text-align: left; box-sizing: border-box;">
+        <h2 style="color: var(--asosiy-rang); font-family: Georgia, serif; font-size: 26px; margin: 0 0 15px 0; border-bottom: 2px solid #e9ecef; padding-bottom: 10px;">🎮 Zukko Kitobxon Viktorinasi</h2>
+        <p style="font-size: 16px; color: #555; margin: 0 0 10px 0;">1. Viktorina jami <strong>20 ta intellektual savoldan</strong> iborat bo'lib, har bir to'g'ri javob uchun sizga <strong>10 ball</strong> beriladi.</p>
+        <p style="font-size: 16px; color: #555; margin: 0 0 10px 0;">2. Har kuni savolar yangilanadi va bir kundagi savollar barcha foydalanuvchilar uchun bir xil bo'ladi.</p>
+        <p style="font-size: 16px; color: #555; margin: 0 0 15px 0;">3. Har yakshanba oqshom soat <strong>20:00 da</strong> eng yuqori ball to'plagan haftalik g'olib rasman <strong>"Hafta Kitobxoni"</strong> unvoniga sazovor bo'ladi!</p>
+    </div>
+
+    <div style="max-width: 1200px; margin: 30px auto; padding: 25px; background: white; border-radius: 16px; border: 1px solid #e9ecef; box-shadow: 0 8px 25px rgba(0,0,0,0.04); text-align: left; box-sizing: border-box;">
+        <h3 style="color: var(--asosiy-rang); font-family: Georgia, serif; font-size: 22px; margin: 0 0 15px 0;">📊 Joriy haftalik peshqadamlar</h3>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; background: #f8f9fa; padding: 12px 20px; border-radius: 8px; border-left: 4px solid #f1c40f; font-weight: bold;">
+                <span>🥇 1. Temurbek Sobirov (Siz)</span>
+                <span style="color: #d35400;">190 Ball</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; background: #f8f9fa; padding: 12px 20px; border-radius: 8px; border-left: 4px solid #bdc3c7;">
+                <span>🥈 2. Sardorbek Olimov</span>
+                <span>170 Ball</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; background: #f8f9fa; padding: 12px 20px; border-radius: 8px; border-left: 4px solid #e67e22;">
+                <span>🥉 3. Gulnoza Toshpulatova</span>
+                <span>150 Ball</span>
+            </div>
+        </div>
+    </div><!-- 6-BO'LEK: VIKTORINA SAVOLLAR BAZASI (JAVASCRIPT) -->
+    <script>
+        const savollarBazasi = [
+            { s: "1. 'Atom odatlar' kitobining muallifi kim?", v: ["Jeyms Klir", "Kel Nyuport", "Robert Kiyosaki", "Said Ahmad"], j: 0 },
+            { s: "2. Kel Nyuportning 'Diqqat' asari inglizcha aslida qanday nomlanadi?", v: ["Focus", "Deep Work", "Atomic Habits", "Digital Minimalism"], j: 1 },
+            { s: "3. 'Ufq' trilogiyasining muallifi o'zbek adabiyotining qaysi yirik namoyondasi?", v: ["Abdulla Qodiriy", "O'tkir Hoshimov", "Said Ahmad", "Cho'lpon"], j: 2 },
+            { s: "4. 'Saodat asri qissalari' asari nima haqida hikoya qiladi?", v: ["Moliyaviy erkinlik", "Islom tarixi va Payg'ambarimiz hayotlari", "Jahon klassikasi tahlili", "O'zbek xonliklari davri"], j: 1 },
+            { s: "5. Robert Kiyosakining mashhur asari qanday nomlanadi?", v: ["Boy ota, kambag'al ota", "Muvaffaqiyat kaliti", "Eng boy odam", "Katta o'yin"], j: 0 },
+            { s: "6. 'Atom odatlar' kitobiga ko'ra, har kuni necha foizga yaxshilanish ulkan natija beradi?", v: ["5%", "10%", "1%", "0.5%"], j: 2 },
+            { s: "7. Kel Nyuport fikricha, yuqori natijali ish samaradorligi formulasi qaysi?", v: ["Vaqt x Diqqat darajasi", "Vaqt + Mehnat", "Mehnat / Tajriba", "Iste'dod x Omad"], j: 0 },
+            { s: "8. 'Ufq' trilogiyasiga qaysi asarlar kiradi?", v: ["Kallik", "Hijron kunlari", "Qirq kun", "Kiyik, Cho'l burguti, Ufq"], j: 3 },
+            { s: "9. 'Saodat asri qissalari' muallifi Ahmad Lutfiy qaysi davlat yozuvchisi?", v: ["O'zbekiston", "Turkiya", "Misr", "Eron"], j: 1 },
+            { s: "10. Biznes va moliya kitoblarida 'Aktiv' deganda nima tushuniladi?", v: ["Sizga xarajat keltiradigan narsa", "Sizning cho'ntagingizga pul soladigan narsa", "Faqat naqd pul", "Kompyuter va jihozlar"], j: 1 },
+            { s: "11. 'Diqqat' kitobida muallif qaysi intellektual turni tark etishni maslahat beradi?", v: ["Ijtimoiy tarmoqlardagi keraksiz vaqtni", "Kitob mutolaasini", "Suhbatlashishni", "Sport mashg'ulotlarini"], j: 0 },
+            { s: "12. Inson miyasida odatlar qayerda shakllanadi?", v: ["Miyacha", "Bazal gangliya", "Peshona bo'lagi", "Gipotalamus"], j: 1 },
+            { s: "13. Said Ahmadning rafiqasi, taniqli o'zbek shoirasi kim?", v: ["Zulfiya", "Saida Zunnunova", "Halima Xudoyberdiyeva", "Oydin Hojiyeva"], j: 1 },
+            { s: "14. 'Boy ota, kambag'al ota' kitobida kambag'al otaning kasbi nima edi?", v: ["Tadbirkor", "Vazir", "Yuqori ma'lumotli o'qituvchi/davlat xizmatchisi", "Bankir"], j: 2 },
+            { s: "15. 'Atom odatlar'da yangi odatni eski odatga ulash qanday nomlanadi?", v: ["Odatlar zanjiri", "Odatlar taxlami (stacking)", "Odatlar filtri", "Odatlar matritsasi"], j: 1 },
+            { s: "16. Chuqur diqqat bilan ishlash jarayoni miyada qaysi moddaning qalinlashishiga olib leladi?", v: ["Miyelin", "Dofamin", "Serotonin", "Adrenalin"], j: 0 },
+            { s: "17. Said Ahmad urush yillarida qayerda surgunda bo'lgan?", v: ["Sibir (Jezqazg'an)", "Uzoq Sharq", "Kavkaz", "Afsonaviy shahar"], j: 0 },
+            { s: "18. 'Saodat asri qissalari' necha jilddan iborat muhtasham asar?", v: ["2 jild", "4 jild", "6 jild", "3 jild"], j: 1 },
+            { s: "19. Robert Kiyosaki fikricha, moliyaviy savodxonlikning birinchi qoidasi nima?", v: ["Ko'p pul topish", "Aktiv va passiv farqini bilish", "Bankdan kredit olish", "Oltin sotib olish"], j: 1 },
+            { s: "20. Quyidagilardan qaysi biri raqamli minimalizm qoidasiga kiradi?", v: ["Doim onlayn bo'lish", "Bildirishnomalarni (notification) o'chirib qo'yish", "Hamma ilovalarni yuklash", "Televizor ko'rish"], j: 1 }
+        ];
+
+        let joriySavolIndeksi = 0;
+        let umumiyBall = 0;
+        let togriJavoblarSoni = 0;// 7-BO'LEK: VIKTORINA LOGIKASI VA TIZIMNI YOPISH
+        function o_yinniBoshlash() {
+            if(joriySavolIndeksi < savollarBazasi.length) {
+                document.getElementById("savolRaqamiOyna").innerText = "Savol: " + (joriySavolIndeksi + 1) + " / 20";
+                document.getElementById("ballOyna").innerText = "Yig'ilgan ball: " + umumiyBall;
+                
+                let sObm = savollarBazasi[joriySavolIndeksi];
+                document.getElementById("savolMatni").innerText = sObm.s;
+                
+                let varKonteyner = document.getElementById("variantlarKonteyneri");
+                varKonteyner.innerHTML = "";
+                
+                sObm.v.forEach((variant, indeks) => {
+                    let tugma = document.createElement("button");
+                    tugma.innerText = variant;
+                    tugma.style.width = "100%";
+                    tugma.style.padding = "12px 20px";
+                    tugma.style.border = "1px solid #cbd5e1";
+                    tugma.style.borderRadius = "6px";
+                    tugma.style.background = "#ffffff";
+                    tugma.style.textAlign = "left";
+                    tugma.style.fontSize = "15px";
+                    tugma.style.cursor = "pointer";
+                    tugma.style.transition = "0.2s background";
+                    
+                    tugma.onmouseover = function() { tugma.style.background = "#f1f5f9"; };
+                    tugma.onmouseout = function() { tugma.style.background = "#ffffff"; };
+                    
+                    tugma.onclick = function() { javobniTekshirish(indeks); };
+                    varKonteyner.appendChild(tugma);
+                });
+            } else {
+                o_yinniTugatish();
+            }
+        }
+
+        function javobniTekshirish(tanlanganIndeks) {
+            let to_griIndeks = savollarBazasi[joriySavolIndeksi].j;
+            if(tanlanganIndeks === to_griIndeks) {
+                umumiyBall += 10;
+                togriJavoblarSoni++;
+            }
+            joriySavolIndeksi++;
+            o_yinniBoshlash();
+        }
+
+        function o_yinniTugatish() {
+            document.getElementById("o_yinKonteyner").style.display = "none";
+            document.getElementById("natijaOynasi").style.display = "block";
+            document.getElementById("savolRaqamiOyna").innerText = "O'yin Yakunlandi!";
+            document.getElementById("ballOyna").innerText = "Yakuniy ball: " + umumiyBall;
+            document.getElementById("yakuniyNatijaMatni").innerText = "Siz 20 ta savoldan " + togriJavoblarSoni + " tasiga to'g'ri javob berdingiz va " + umumiyBall + " ball to'pladingiz!";
+        }
+
+        window.addEventListener('load', function() {
+            o_yinniBoshlash();
+        });
+    </script>
 </body>
 </html>
